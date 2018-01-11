@@ -25,6 +25,17 @@ class BaseModel(Model):
         database = db
 
 
+class Lessons(BaseModel):
+    monday = TextField(null=True)
+    tuesday = TextField(null=True)
+    wednesday = TextField(null=True)
+    thursday = TextField(null=True)
+    friday = TextField(null=True)
+    saturday = TextField(null=True)
+    sunday = TextField(null=True)
+    upd_dt = DateTimeField(default=dt.now())
+
+
 class Users(BaseModel):
     telegram_id = IntegerField(unique=1)
     username = CharField(null=True)
@@ -32,6 +43,12 @@ class Users(BaseModel):
     is_student = BooleanField(null=True, default=True)
     city = CharField(null=True)
     show_trains = BooleanField(null=True, default=False)
+    lessons = ForeignKeyField(
+        Lessons,
+        to_field='id',
+        null=True,
+        on_delete='CASCADE'
+    )
     dt = DateTimeField(default=dt.now())
 
     @staticmethod
@@ -71,24 +88,14 @@ class Users(BaseModel):
         self.email = email.lower()
 
 
-class Lessons(BaseModel):
-    student = ForeignKeyField(
-        Users,
-        to_field='telegram_id',
-        on_update='CASCADE',
-        db_column='student_tg_id'
-    )
-    monday = TextField(null=True)
-    tuesday = TextField(null=True)
-    wednesday = TextField(null=True)
-    thursday = TextField(null=True)
-    friday = TextField(null=True)
-    saturday = TextField(null=True)
-    sunday = TextField(null=True)
-    upd_dt = DateTimeField(default=dt.now())
-
-
 class Lecturers(BaseModel):
+    lecturer_id = CharField(unique=True)
     fio = CharField(index=True)  # index to faster search by this field
     chair = CharField()  # department in RUZ notation
-    lecturer_id = IntegerField(unique=True)
+    lessons = ForeignKeyField(
+        Lessons,
+        to_field='id',
+        null=True,
+        on_delete='CASCADE'
+    )
+    upd_dt = DateTimeField(default=dt.now())
